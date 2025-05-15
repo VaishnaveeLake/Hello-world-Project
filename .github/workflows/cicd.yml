@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build_complie:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +27,17 @@ jobs:
     - name: Lint Python code
       run: |
         flake8 src/app.py
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy -y
+        
+    - name: Scan source code and IaC with Trivy
+      run: trivy config --exit-code 1 --severity HIGH,CRITICAL .
 
         
     - name: Run Python app
