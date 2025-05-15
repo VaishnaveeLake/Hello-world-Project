@@ -26,10 +26,4 @@ jobs:
         sleep 5
         # You can add curl or other tests here if needed
 
-        
-
-       
-   
-      with:
-        name: docker-image
-        path: docker-images/hello-world-app.tar
+     
