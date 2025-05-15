@@ -1,0 +1,31 @@
+name: CI Pipeline - Build Docker Image Locally
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Lint the Python app (using flake8)
+    - name: Lint Python code
+      run: |
+        pip install flake8
+        flake8 app.py
+
+    # Step 3: Build Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t hello-world-app .
+
+    # Step 4: Save Docker image to local folder
+    - name: Save Docker image to folder
+      run: |
+        mkdir -p docker-images
+        docker save hello-world-app > docker-images/hello-world-app.tar
