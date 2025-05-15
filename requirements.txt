@@ -1,2 +1,4 @@
 flask==2.2.5
 flake8==6.1.0
+pytest
+gunicorn
