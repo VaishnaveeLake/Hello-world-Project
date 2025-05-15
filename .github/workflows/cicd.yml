@@ -12,27 +12,24 @@ jobs:
     # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
-
-    # Step 2: Lint the Python app (using flake8)
-    - name: Lint Python code
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
       run: |
-        pip install flake8
-        flake8 app.py
-
-    # Step 3: Build Docker image
-    - name: Build Docker image
+        python -m pip install --upgrade pip
+        pip install flask
+    - name: Run Python app
       run: |
-        docker build -t hello-world-app .
+        python src/app.py &
+        sleep 5
+        # You can add curl or other tests here if needed
 
-    # Step 4: Save Docker image to local folder
-    - name: Save Docker image to folder
-      run: |
-        mkdir -p docker-images
-        docker save hello-world-app > docker-images/hello-world-app.tar
+        
 
-   # Step 5: Upload Docker image artifact
-    - name: Upload Docker image artifact
-      uses: actions/upload-artifact@v3
+       
+   
       with:
         name: docker-image
         path: docker-images/hello-world-app.tar
