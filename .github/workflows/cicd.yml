@@ -33,10 +33,6 @@ jobs:
         python src/app.py &
         sleep 5
 
-  build_image:
-   runs-on: self-hosted
-
-   steps:
     - name: Build Docker image
       run: |
         docker build -t hello-world-app:latest .
@@ -51,6 +47,12 @@ jobs:
       run: |
         mkdir -p docker-images
         docker save hello-world-app > docker-images/hello-world-app.tar
+        
+    - name: Upload Docker image as artifact
+      uses: actions/upload-artifact@v4
+      with:
+         name: hello-world-app
+         path: docker-images/hello-world-app.tar
         
     
 
