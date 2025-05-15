@@ -47,5 +47,11 @@ jobs:
       run: |
         mkdir -p docker-images
         docker save hello-world-app > docker-images/hello-world-app.tar
+        
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v3
+      with:
+       name: hello-world-docker-image
+       path: docker-images/hello-world-app.tar
 
      
