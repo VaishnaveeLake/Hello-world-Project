@@ -25,5 +25,9 @@ jobs:
         python src/app.py &
         sleep 5
         # You can add curl or other tests here if needed
+    - name: Build Docker image
+      run: |
+        docker build -t hello-world-app .
+        
 
      
