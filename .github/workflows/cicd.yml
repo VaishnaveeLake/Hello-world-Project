@@ -7,9 +7,9 @@ on:
 jobs:
   checkout:
     runs-on: self-hosted
-
+    outputs:
+      python-ready: yes
     steps:
-    # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
       
@@ -21,39 +21,40 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flask
-        pip install flake8
+        pip install flask flake8
 
     - name: Lint Python code
-      run: |
-        flake8 src/app.py
+      run: flake8 src/app.py
 
-    - name: Run Python app
+    - name: Run Python app in background
       run: |
         python src/app.py &
         sleep 5
 
+  build-image:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Build Docker image
-      run: |
-        docker build -t hello-world-app:latest .
+      run: docker build -t hello-world-app:latest .
 
     - name: Verify Docker image created
-      run: |
-        docker images | grep hello-world-app
-        
+      run: docker images | grep hello-world-app
 
-    # Save Docker image to local folder
+  save-upload:
+    runs-on: self-hosted
+    needs: build-image
+    steps:
     - name: Save Docker image to folder
       run: |
         mkdir -p docker-images
         docker save hello-world-app > docker-images/hello-world-app.tar
-        
+
     - name: Upload Docker image as artifact
       uses: actions/upload-artifact@v4
       with:
-         name: hello-world-app
-         path: docker-images/hello-world-app.tar
-        
-    
-
-     
+        name: hello-world-app
+        path: docker-images/hello-world-app.tar
