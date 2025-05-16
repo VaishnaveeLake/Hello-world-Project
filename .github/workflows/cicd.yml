@@ -39,8 +39,7 @@ jobs:
   build-image:
     runs-on: self-hosted
     needs: checkout
-    env:
-      SHORT_SHA: ${{ needs.checkout.outputs.short_sha }}
+  
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -55,7 +54,8 @@ jobs:
 
   save-upload:
     runs-on: self-hosted
-    needs: build-image
+    needs: [checkout, build-image]
+    
     steps:
     - name: Save Docker image to folder
       run: |
