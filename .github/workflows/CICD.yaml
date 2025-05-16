@@ -96,9 +96,6 @@ jobs:
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
 
-    - name: Wait for pod to be ready
-      run: |
-        kubectl wait --for=condition=ready pod -l app=hello-world --timeout=60s
 
     - name: Show Minikube service URL
       run: minikube service hello-world --url
