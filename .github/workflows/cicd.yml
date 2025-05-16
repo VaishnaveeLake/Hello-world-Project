@@ -89,7 +89,16 @@ jobs:
     - name: Replace image tag in deployment file
       run: |
         TAG=${{ needs.checkout.outputs.build_tag }}
-        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml > deployment.yaml
+        if [ ! -f deployment-template.yaml ]; then
+        echo "ERROR: deployment-template.yaml not found!"
+        exit 1
+        fi
+        grep "image: hello-world-app" deployment-template.yaml || {
+         echo "ERROR: 'image:' line not found or doesn't match"
+         exit 1
+        }
+        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml
+
 
     - name: Debug — Show deployment.yaml contents
       run: |
