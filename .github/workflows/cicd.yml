@@ -8,6 +8,7 @@ jobs:
   checkout:
     runs-on: self-hosted
     outputs:
+      short_sha: ${{ steps.get_sha.outputs.short_sha }}
       python-ready: yes
     steps:
     - name: Checkout code
@@ -30,16 +31,23 @@ jobs:
       run: |
         python src/app.py &
         sleep 5
+        
+    - name: Get short commit SHA
+      id: get_sha
+      run: echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+  
 
   build-image:
     runs-on: self-hosted
     needs: checkout
+    env:
+      SHORT_SHA: ${{ needs.checkout.outputs.short_sha }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Build Docker image
-      run: docker build -t hello-world-app:latest .
+      run: docker build -t hello-world-app:$SHORT_SHA .
 
     - name: Verify Docker image created
       run: docker images | grep hello-world-app
@@ -47,14 +55,16 @@ jobs:
   save-upload:
     runs-on: self-hosted
     needs: build-image
+    env:
+      SHORT_SHA: ${{ needs.checkout.outputs.short_sha }}
     steps:
     - name: Save Docker image to folder
       run: |
         mkdir -p docker-images
-        docker save hello-world-app > docker-images/hello-world-app.tar
+        docker save hello-world-app:$SHORT_SHA > docker-images/hello-world-app-${SHORT_SHA}.tar
 
     - name: Upload Docker image as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hello-world-app
-        path: docker-images/hello-world-app.tar
+        name: hello-world-app-${{ env.SHORT_SHA }}
+        path: docker-images/hello-world-app-${{ env.SHORT_SHA }}.tar
