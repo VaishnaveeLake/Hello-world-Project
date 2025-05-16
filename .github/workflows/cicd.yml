@@ -91,6 +91,11 @@ jobs:
         TAG=${{ needs.checkout.outputs.build_tag }}
         sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml > deployment.yaml
 
+    - name: Debug — Show deployment.yaml contents
+      run: |
+        echo "Generated deployment.yaml:"
+        cat deployment.yaml
+    
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
 
