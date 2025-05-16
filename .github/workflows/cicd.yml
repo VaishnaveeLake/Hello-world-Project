@@ -6,7 +6,7 @@ on:
 
 jobs:
   checkout:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     # Step 1: Checkout code
