@@ -8,7 +8,7 @@ jobs:
   checkout:
     runs-on: self-hosted
     outputs:
-      short_sha: ${{ steps.sha.outputs.short }}
+      build_tag: ${{ steps.set_tag.outputs.tag }}
       python-ready: yes
     steps:
     - name: Checkout code
@@ -32,11 +32,10 @@ jobs:
         python src/app.py &
         sleep 5
         
-    - name: Get short commit SHA
-      id: get_sha
-      run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-  
-
+    - name: Set BUILD_TAG from timestamp
+      id: set_tag
+      run: echo "tag=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+      
   build-image:
     runs-on: self-hosted
     needs: checkout
@@ -46,9 +45,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Build Docker image
+    - name: Build Docker image with timestamp
       run: |
-       TAG=${{ needs.checkout.outputs.short_sha }}
+       TAG=${{ needs.checkout.outputs.build_tag }}
        docker build -t hello-world-app:$TAG .
 
     - name: Verify Docker image created
@@ -60,12 +59,15 @@ jobs:
     steps:
     - name: Save Docker image to folder
       run: |
-        TAG=${{ needs.checkout.outputs.short_sha }}
+        TAG=${{ needs.checkout.outputs.build_tag }}
         mkdir -p docker-images
         docker save hello-world-app:$TAG -o docker-images/hello-world-app-$TAG.tar
 
     - name: Upload Docker image as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hello-world-app-${{ needs.checkout.outputs.short_sha }}
-        path: docker-images/hello-world-app-${{ needs.checkout.outputs.short_sha }}.tar
+        name: hello-world-app-${{ needs.checkout.outputs.build_tag }}
+        path: docker-images/hello-world-app-${{ needs.checkout.outputs.build_tag }}.tar
+
+
+        
