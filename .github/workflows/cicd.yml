@@ -68,6 +68,37 @@ jobs:
       with:
         name: hello-world-app-${{ needs.checkout.outputs.build_tag }}
         path: docker-images/hello-world-app-${{ needs.checkout.outputs.build_tag }}.tar
+    
+  deploy-to-minikube:
+    runs-on: self-hosted
+    needs: [checkout, save-upload]
+    
+    steps:
+    - name: Download Docker image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: hello-world-app-${{ needs.checkout.outputs.build_tag }}
+        path: ./docker-images
+
+    - name: Load Docker image into Minikube
+      run: |
+        eval $(minikube -p minikube docker-env)
+        TAG=${{ needs.checkout.outputs.build_tag }}
+        docker load -i ./docker-images/hello-world-app-$TAG.tar
+
+    - name: Replace image tag in deployment file
+      run: |
+        TAG=${{ needs.checkout.outputs.build_tag }}
+        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment-template.yaml > deployment.yaml
+
+    - name: Apply deployment to Minikube
+      run: kubectl apply -f deployment.yaml
+
+    - name: Wait and show service info
+      run: |
+        echo "Waiting for service..."
+        sleep 10
+        minikube service hello-world --url
 
 
-        
+    
