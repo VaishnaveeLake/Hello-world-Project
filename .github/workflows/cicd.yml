@@ -55,16 +55,15 @@ jobs:
   save-upload:
     runs-on: self-hosted
     needs: build-image
-    env:
-      SHORT_SHA: ${{ needs.checkout.outputs.short_sha }}
     steps:
     - name: Save Docker image to folder
       run: |
+        SHORT_SHA=${{ needs.checkout.outputs.short_sha }}
         mkdir -p docker-images
-        docker save hello-world-app:$SHORT_SHA > docker-images/hello-world-app-${SHORT_SHA}.tar
+        docker save hello-world-app:$SHORT_SHA -o docker-images/hello-world-app-${SHORT_SHA}.tar
 
     - name: Upload Docker image as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hello-world-app-${{ env.SHORT_SHA }}
-        path: docker-images/hello-world-app-${{ env.SHORT_SHA }}.tar
+        name: hello-world-app-${{ needs.checkout.outputs.short_sha }}
+        path: docker-images/hello-world-app-${{ needs.checkout.outputs.short_sha }}.tar
