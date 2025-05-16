@@ -89,11 +89,11 @@ jobs:
     - name: Replace image tag in deployment file
       run: |
         TAG=${{ needs.checkout.outputs.build_tag }}
-        if [ ! -f deployment-template.yaml ]; then
-        echo "ERROR: deployment-template.yaml not found!"
+        if [ ! -f deployment.yaml ]; then
+        echo "ERROR: deployment.yaml not found!"
         exit 1
         fi
-        grep "image: hello-world-app" deployment-template.yaml || {
+        grep "image: hello-world-app" deployment.yaml || {
          echo "ERROR: 'image:' line not found or doesn't match"
          exit 1
         }
