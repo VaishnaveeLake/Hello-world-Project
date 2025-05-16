@@ -1,0 +1,104 @@
+name: CI Pipeline - Build Docker Image Locally
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  checkout:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+  
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask flake8
+
+    - name: Lint Python code
+      run: flake8 src/app.py
+
+    - name: Run Python app in background
+      run: |
+        python src/app.py &
+        sleep 5
+
+  build-image:
+    runs-on: self-hosted
+    needs: checkout
+  
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image with fixed tag 'latest'
+      run: |
+        docker build -t hello-world-app:latest .
+
+    - name: Verify Docker image created
+      run: docker images | grep hello-world-app
+
+  save-upload:
+    runs-on: self-hosted
+    needs: [checkout, build-image]
+    
+    steps:
+    - name: Save Docker image to folder
+      run: |
+        mkdir -p docker-images
+        docker save hello-world-app:latest -o docker-images/hello-world-app-latest.tar
+
+    - name: Upload Docker image as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: hello-world-app-latest
+        path: docker-images/hello-world-app-latest.tar
+    
+  deploy-to-minikube:
+    runs-on: self-hosted
+    needs: [checkout, save-upload]
+    
+    steps:
+    - name: Download Docker image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: hello-world-app-latest
+        path: ./docker-images
+
+    - name: Load Docker image into Minikube
+      run: |
+        eval $(minikube -p minikube docker-env)
+        docker load -i ./docker-images/hello-world-app-latest.tar
+
+    - name: Verify deployment.yaml exists
+      run: |
+        if [ ! -f deployment.yaml ]; then
+          echo "ERROR: deployment.yaml not found!"
+          exit 1
+        fi
+
+    - name: Replace image tag in deployment.yaml (in-place)
+      run: |
+        sed -i "s|image: hello-world-app:.*|image: hello-world-app:latest|" deployment.yaml
+
+    - name: Debug — Show deployment.yaml contents
+      run: |
+        echo "Final deployment.yaml content:"
+        cat deployment.yaml
+
+    - name: Apply deployment to Minikube
+      run: kubectl apply -f deployment.yaml
+
+    - name: Wait for pod to be ready
+      run: |
+        kubectl wait --for=condition=ready pod -l app=hello-world --timeout=60s
+
+    - name: Show Minikube service URL
+      run: minikube service hello-world --url
