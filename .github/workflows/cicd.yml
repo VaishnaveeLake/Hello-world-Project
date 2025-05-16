@@ -89,7 +89,7 @@ jobs:
     - name: Replace image tag in deployment file
       run: |
         TAG=${{ needs.checkout.outputs.build_tag }}
-        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment-template.yaml > deployment.yaml
+        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml > deployment.yaml
 
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
