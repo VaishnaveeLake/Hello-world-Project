@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: hello-world-app:20250516141104  
+        image: hello-world-app:REPLACEME  
         ports:
         - containerPort: 5000
 ---
