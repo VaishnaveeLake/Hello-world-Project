@@ -47,7 +47,7 @@ jobs:
     - name: Build Docker image with timestamp
       run: |
        TAG=${{ needs.checkout.outputs.build_tag }}
-       docker build -t --no-cache hello-world-app:$TAG .
+       docker build --no-cache -t hello-world-app:$TAG .
 
     - name: Verify Docker image created
       run: docker images | grep hello-world-app
