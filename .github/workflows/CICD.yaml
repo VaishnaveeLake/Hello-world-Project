@@ -40,7 +40,7 @@ jobs:
 
     - name: Build Docker image with fixed tag 'latest'
       run: |
-        docker build -t hello-world-app:latest .
+        docker build --no-cache -t hello-world-app:latest .
 
     - name: Verify Docker image created
       run: docker images | grep hello-world-app
@@ -76,6 +76,7 @@ jobs:
       run: |
         eval $(minikube -p minikube docker-env)
         docker load -i ./docker-images/hello-world-app-latest.tar
+        docker images | grep hello-world-app
 
     - name: Verify deployment.yaml exists
       run: |
