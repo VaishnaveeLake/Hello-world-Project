@@ -117,7 +117,7 @@ jobs:
       run: |
         nohup kubectl port-forward service/hello-world 8080:80 --address 0.0.0.0 > pf.log 2>&1 &
         echo "Port forwarding started in background"
-        sleep 60
+        sleep 600
 
 
     - name: Wait and show service info
