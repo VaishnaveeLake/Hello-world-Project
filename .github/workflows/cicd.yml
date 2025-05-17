@@ -47,7 +47,7 @@ jobs:
     - name: Build Docker image with timestamp
       run: |
        TAG=${{ needs.checkout.outputs.build_tag }}
-       docker build -t hello-world-app:$TAG .
+       docker build -t --no-cache hello-world-app:$TAG .
 
     - name: Verify Docker image created
       run: docker images | grep hello-world-app
@@ -107,6 +107,13 @@ jobs:
     
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
+
+    - name: Run kubectl port-forward binding to 0.0.0.0
+      run: |
+        nohup kubectl port-forward service/hello-world 8080:80 --address 0.0.0.0 > pf.log 2>&1 &
+        echo "Port forwarding started in background"
+        sleep 60
+
 
     - name: Wait and show service info
       run: |
