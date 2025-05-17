@@ -1,4 +1,4 @@
-name: CI Pipeline - Build Docker Image Locally
+name: CI Pipeline
 
 on:
   push:
