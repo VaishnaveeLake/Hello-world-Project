@@ -44,6 +44,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Clean up old containers using hello-world-app:latest
+      run: |
+        docker ps -q --filter "ancestor=hello-world-app:latest" | xargs -r docker stop
+        docker ps -a -q --filter "ancestor=hello-world-app:latest" | xargs -r docker rm
+
     - name: Build Docker image with timestamp
       run: |
        TAG=${{ needs.checkout.outputs.build_tag }}
