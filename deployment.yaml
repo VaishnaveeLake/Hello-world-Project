@@ -32,4 +32,4 @@ spec:
     - protocol: TCP
       port: 80          # Expose port 80 on service
       targetPort: 5000  # Forward to container port 5000
-      nodeport: 30085
+      nodePort: 30085
