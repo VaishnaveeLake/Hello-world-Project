@@ -97,7 +97,7 @@ jobs:
          echo "ERROR: 'image:' line not found or doesn't match"
          exit 1
         }
-        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml
+        sed -i "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml
 
 
     - name: Debug — Show deployment.yaml contents
