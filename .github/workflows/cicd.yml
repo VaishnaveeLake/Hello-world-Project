@@ -126,5 +126,3 @@ jobs:
         sleep 10
         minikube service hello-world --url
 
-
-    
