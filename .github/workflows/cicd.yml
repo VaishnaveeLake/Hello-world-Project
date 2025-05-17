@@ -115,9 +115,10 @@ jobs:
 
     - name: Run kubectl port-forward binding to 0.0.0.0
       run: |
-        nohup kubectl port-forward service/hello-world 8080:80 --address 0.0.0.0 > pf.log 2>&1 &
+        tmux new -s portforward
+        kubectl port-forward service/hello-world 8080:80 --address 0.0.0.0
         echo "Port forwarding started in background"
-        sleep 600
+        sleep 60
 
 
     - name: Wait and show service info
