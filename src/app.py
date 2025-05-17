@@ -64,18 +64,20 @@ HTML_TEMPLATE = """
 </html>
 """
 
-@app.route('/', methods=['GET', 'POST'])
-def hello():
-    if request.method == 'POST':
-        name = request.form.get('name', 'World')
-    else:
-        name = 'World'
 
-    # ✅ Set your correct time zone (replace with your preferred one)
-    tz = pytz.timezone("Europe/Dublin")  # Change to your correct time zone
-    current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
+@app.route("/", methods=["GET", "POST"])
+def hello():
+    if request.method == "POST":
+        name = request.form.get("name", "World")
+    else:
+        name = "World"
+
+    # Set to your preferred time zone
+    timezone = pytz.timezone("Europe/Dublin")  # Change as needed
+    current_time = datetime.now(timezone).strftime("%Y-%m-%d %H:%M:%S")
 
     return render_template_string(HTML_TEMPLATE, name=name, time=current_time)
 
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host="0.0.0.0", port=5000)

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: hello-world-app:20250516141104  
+        image: hello-world-app:REPLACEME  
         ports:
         - containerPort: 5000
 ---
@@ -31,6 +31,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80          # Expose port 80 on service
-      targetPort: 5000
-      nodeport: 30085  # Forward to container port 5000
-      
+      targetPort: 5000  # Forward to container port 5000
+      nodeport: 30085

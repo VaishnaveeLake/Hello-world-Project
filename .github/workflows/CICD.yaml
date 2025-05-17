@@ -7,9 +7,7 @@ on:
 jobs:
   checkout:
     runs-on: self-hosted
-    outputs:
-      build_tag: ${{ steps.set_tag.outputs.tag }}
-  
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -31,11 +29,7 @@ jobs:
       run: |
         python src/app.py &
         sleep 5
-        
-    - name: Set BUILD_TAG from timestamp
-      id: set_tag
-      run: echo "tag=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
-      
+
   build-image:
     runs-on: self-hosted
     needs: checkout
@@ -44,10 +38,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Build Docker image with timestamp
+    - name: Build Docker image with fixed tag 'latest'
       run: |
-       TAG=${{ needs.checkout.outputs.build_tag }}
-       docker build -t hello-world-app:$TAG .
+        docker build -t hello-world-app:latest .
 
     - name: Verify Docker image created
       run: docker images | grep hello-world-app
@@ -59,15 +52,14 @@ jobs:
     steps:
     - name: Save Docker image to folder
       run: |
-        TAG=${{ needs.checkout.outputs.build_tag }}
         mkdir -p docker-images
-        docker save hello-world-app:$TAG -o docker-images/hello-world-app-$TAG.tar
+        docker save hello-world-app:latest -o docker-images/hello-world-app-latest.tar
 
     - name: Upload Docker image as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hello-world-app-${{ needs.checkout.outputs.build_tag }}
-        path: docker-images/hello-world-app-${{ needs.checkout.outputs.build_tag }}.tar
+        name: hello-world-app-latest
+        path: docker-images/hello-world-app-latest.tar
     
   deploy-to-minikube:
     runs-on: self-hosted
@@ -77,42 +69,39 @@ jobs:
     - name: Download Docker image artifact
       uses: actions/download-artifact@v4
       with:
-        name: hello-world-app-${{ needs.checkout.outputs.build_tag }}
+        name: hello-world-app-latest
         path: ./docker-images
 
     - name: Load Docker image into Minikube
       run: |
         eval $(minikube -p minikube docker-env)
-        TAG=${{ needs.checkout.outputs.build_tag }}
-        docker load -i ./docker-images/hello-world-app-$TAG.tar
+        docker load -i ./docker-images/hello-world-app-latest.tar
 
-    - name: Replace image tag in deployment file
+    - name: Verify deployment.yaml exists
       run: |
-        TAG=${{ needs.checkout.outputs.build_tag }}
         if [ ! -f deployment.yaml ]; then
-        echo "ERROR: deployment.yaml not found!"
-        exit 1
+          echo "ERROR: deployment.yaml not found!"
+          exit 1
         fi
-        grep "image: hello-world-app" deployment.yaml || {
-         echo "ERROR: 'image:' line not found or doesn't match"
-         exit 1
-        }
-        sed "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml
 
+    - name: Replace image tag in deployment.yaml (in-place)
+      run: |
+        sed -i "s|image: hello-world-app:.*|image: hello-world-app:latest|" deployment.yaml
 
     - name: Debug — Show deployment.yaml contents
       run: |
-        echo "Generated deployment.yaml:"
+        echo "Final deployment.yaml content:"
         cat deployment.yaml
-    
+
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
-
-    - name: Wait and show service info
+      
+    - name: Run kubectl port-forward binding to 0.0.0.0
       run: |
-        echo "Waiting for service..."
-        sleep 10
-        minikube service hello-world --url
+        nohup kubectl port-forward service/hello-world 8080:80 --address 0.0.0.0 > pf.log 2>&1 &
+        echo "Port forwarding started in background"
+        sleep 600
+  
 
-
-    
+    - name: Show Minikube service URL
+      run: minikube service hello-world --url
