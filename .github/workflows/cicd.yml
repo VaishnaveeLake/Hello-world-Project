@@ -141,7 +141,7 @@ jobs:
     - name: Check Kubernetes Deployment Status
       run: |
         echo "Fetching all Kubernetes resources..."
-        sleep 20 && kubectl get all -n default
+        sleep 30 && kubectl get pods && kubectl get svc && kubectl get deployments -n default
       
    
 # Expose the app using port-forwarding so we can access it on http://ec2-ip-address:8080
