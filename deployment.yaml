@@ -33,3 +33,24 @@ spec:
       port: 80          # Expose port 80 on service
       targetPort: 5000  # Forward to container port 5000
       nodePort: 30085
+
+---
+
+# hello-world-ingress.yaml
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: hello-world
+spec:
+  rules:
+  - host: "example.com"
+    http:
+      paths:
+      - path: "/hello"
+        pathType: Prefix
+        backend:
+          service: 
+            name: hello-world
+            port:
+              number: 80
+
