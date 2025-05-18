@@ -1,3 +1,4 @@
+#This is a basic "Hello World" Flask app set up for deployment to a Kubernetes cluster via GitHub Actions CI/CD pipeline. 
 from flask import Flask, render_template_string, request
 from datetime import datetime
 import pytz
