@@ -3,7 +3,7 @@ name: CI Pipeline - Build Docker Image Locally
 on:
   push:
     branches: [main]
-
+    
 jobs:
   checkout:
     runs-on: self-hosted
