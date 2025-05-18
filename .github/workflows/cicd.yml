@@ -137,6 +137,13 @@ jobs:
     - name: Apply deployment to Minikube
       run: kubectl apply -f deployment.yaml
 
+# Will check the deployment status 
+    - name: Check Kubernetes Deployment Status
+      run: |
+        echo "Fetching all Kubernetes resources..."
+        sleep 20 && kubectl get all -n default
+      
+   
 # Expose the app using port-forwarding so we can access it on http://ec2-ip-address:8080
     - name: Run kubectl port-forward binding to 0.0.0.0
       run: |
