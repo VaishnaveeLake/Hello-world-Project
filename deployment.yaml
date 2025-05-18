@@ -1,58 +1,67 @@
-apiVersion: apps/v1
-kind: Deployment
+# ---------------------------
+# This section is for deploying our Flask app
+# ---------------------------
+apiVersion: apps/v1          # Specifies the API version used for deployments
+kind: Deployment             # Declares this resource as a Deployment
 metadata:
-  name: hello-world
+  name: hello-world          # This is just the name of the deployment: hello-world
   labels:
-    app: hello-world
+    app: hello-world         # Labels to identify and group resources
 spec:
-  replicas: 2
-  selector:
+  replicas: 2                # Number of pod replicas to maintain while deploying .We want 2 copies (pods) of our app running.
+  selector:                  # Selector to match the pods managed by this Deployment
     matchLabels:
-      app: hello-world
+      app: hello-world       # This makes sure the deployment picks the right pods to manage
   template:
     metadata:
       labels:
-        app: hello-world
+        app: hello-world                  # Labels applied to the pods created by this Deployment
     spec:
       containers:
-      - name: flask-container
-        image: hello-world-app:REPLACEME  
+      - name: flask-container                      # Name of the container in the pod (it can be anything)
+        image: hello-world-app:REPLACEME               # This is the Docker image we'll use — CI/CD will replace REPLACEME with a tag
         ports:
-        - containerPort: 5000
+        - containerPort: 5000                           # Flask app runs on port 5000 inside the container
+
 ---
+
+# ---------------------------
+# This section creates a Service to expose the app
+# ---------------------------
 apiVersion: v1
-kind: Service
+kind: Service               # Declares this resource as a Service
 metadata:
-  name: hello-world
+  name: hello-world         # Name of the Service 
 spec:
   selector:
-    app: hello-world
-  type: NodePort
+    app: hello-world        # This links the service to the right pods (selector must match with label above)
+  type: NodePort            # We’re exposing the app on a port of the VM/Node
   ports:
     - protocol: TCP
-      port: 80          # Expose port 80 on service
-      targetPort: 5000  # Forward to container port 5000
-      nodePort: 30085
+      port: 80              # Port exposed by the service
+      targetPort: 5000      # Port the container is listening on
+      nodePort: 30085       # This is the actual port on the VM we’ll use to reach the app from outside
 
 ---
 
-# hello-world-ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# ---------------------------
+# Ingress setup: routing traffic to our service
+# ---------------------------
+apiVersion: networking.k8s.io/v1             # Ingress API version
+kind: Ingress                                  # Declares this resource as an Ingress
 metadata:
-  name: hello-world
+  name: hello-world                              # Name of the Ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /             # Tells nginx to rewrite the path (kind of like cleanup)
 spec:
   rules:
-  - host: "check-my-example.com"
+  - host: "check-my-example.com"   # Domain name to access the app. (It make sure DNS points here or use /etc/hosts for testing)
     http:
       paths:
-      - path: "/hello"
-        pathType: Prefix
+      - path: "/hello"              # When someone visits check-my-example.com/hello
+        pathType: Prefix           # It should match anything that starts with /hello
         backend:
           service: 
-            name: hello-world
+            name: hello-world      # It will forward the traffic to this service
             port:
-              number: 80
-
+              number: 80           # It will forward the traffic to this port (which we exposed above)
