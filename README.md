@@ -246,4 +246,38 @@ Deployed app was running inside minikube cluster, but not accessible via browser
 Fix: Used kubectl port-forward to forward a local port on my machine to the pod port inside the cluster, allowing browser access.
 
 
+# If you want to run the application to another machine , what should you do?
 
+CI pipeline runs successfully up to the point where the Docker image is built and saved as a .tar file.
+
+Once image is saved to artifact , download the artifacts to your local machine and unzip the file.
+
+```bash
+unzip hello-world-app-20250519100909.zip
+```
+Load docker image 
+```bash
+docker load -i hello-world-app-20250519100909.tar
+```
+```bash
+minikube image load hello-world-app:20250519100909  # Minikube should be pre-installed in you local machine
+```
+Go to the project and open terminal inside project, check and change container image name accordingly.
+
+Run deployment.yaml file and check pods getting created
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl get pods
+```
+
+Once 2 pods are up and running start the minikube service to expose app .
+```bash
+minikube service hello-world
+```
+
+![image](https://github.com/user-attachments/assets/e9e0f128-1dc1-4fbc-b23b-3a2cd9623e4d)
+ 
+Go to the browser and hit the URL. Application will be running on your local machine .
+
+![image](https://github.com/user-attachments/assets/121758fd-a8ab-4ebd-89a5-6b73402fac20)
