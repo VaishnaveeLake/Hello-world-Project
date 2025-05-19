@@ -195,3 +195,55 @@ The application has been successfully deployed on Minikube and is now up and run
 
 
 
+# Issues faced and solution :
+
+❌ Issue: Linting Error (flake8 - W503, E203, max-line-length)
+
+When running flake8, you might encounter issues like:
+
+W503: line break before a binary operator
+
+E203: whitespace before a colon or comma
+
+E501: line too long (usually > 79 or 88 chars, unless configured)
+
+Fix: In the root of project, created a file named .flake8 to ignore rules that conflict with formatting.
+
+❌ Issue: GitHub actions runner was not executing
+
+CI/CD pipeline was triggered, but the runner didn’t pick up the job.
+
+Fix: Ensured the run.sh script was running continuously on the self-hosted runner machine.
+
+❌ Issue: Docker image not found during deployment
+
+Kubernetes deployment failed because the local Docker image was not available inside Minikube.
+
+Fix: Used eval $(minikube docker-env) before building the image so Docker builds inside Minikube's environment.
+
+❌ Issue: Kubeconfig not set
+
+kubectl could not connect to the cluster because kubeconfig was not configured.
+
+Fix: Ensured minikube status is running else ran minikube start and ensured kubectl config use-context minikube was set properly.
+
+❌ Issue: Pod CrashLoopBackOff Error
+
+After deployment, the pod was repeatedly failing to start.
+
+Fix: Checked pod logs using kubectl logs <pod-name> , the app tries to bind to a port already in use inside the container. Corrected the config.
+
+❌ Issue: Deployment YAML tag not updating
+
+Changes to the image tag in the Kubernetes deployment YAML were not reflected after applying the changes.
+
+Used the sed command to automate the update of the image tag inside the YAML file before running kubectl apply command.
+
+❌ Issue: Service was not accessible on browser
+
+Deployed app was running inside minikube cluster, but not accessible via browser.
+
+Fix: Used kubectl port-forward to forward a local port on my machine to the pod port inside the cluster, allowing browser access.
+
+
+
