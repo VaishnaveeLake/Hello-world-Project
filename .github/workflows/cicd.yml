@@ -107,14 +107,14 @@ jobs:
     - name: Load Docker image into Minikube
       run: |
         eval $(minikube -p minikube docker-env)   
-        TAG=${{ needs.checkout.outputs.build_tag }}   #
-        docker load -i ./docker-images/hello-world-app-$TAG.tar  #Loads a Docker image saved in a .tar file back into the Docker daemon.
+        TAG=${{ needs.checkout.outputs.build_tag }}   
+        docker load -i ./docker-images/hello-world-app-$TAG.tar  # Loads a Docker image saved in a .tar file back into the Docker daemon.
 
  # Update the image tag inside our Kubernetes deployment YAML file
     - name: Replace image tag in deployment file
       run: |
         TAG=${{ needs.checkout.outputs.build_tag }}
-        if [ ! -f deployment.yaml ]; then   #If deployment file is not present print error message and exit .
+        if [ ! -f deployment.yaml ]; then   # If deployment file is not present print error message and exit .
         echo "ERROR: deployment.yaml not found!"
         exit 1
         fi
@@ -123,7 +123,7 @@ jobs:
          exit 1
         }
         sed -i "s|image: hello-world-app:.*|image: hello-world-app:$TAG|" deployment.yaml
-#Above command updates the Docker image tag in Kubernetes deployment file to use the current build tag stored in $TAG. 
+# Above command updates the Docker image tag in Kubernetes deployment file to use the current build tag stored in $TAG. 
 # to ensures deployment points to the correct image version.
 
 # Show the contents of the updated YAML file (handy for debugging)
