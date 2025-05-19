@@ -4,7 +4,7 @@ name: CICD Pipeline       # Giving our workflow a name just for clarity in GitHu
 on:
   push:
     branches: [main]
-    
+   
 jobs:
 # First job: do initial stuff like checking out code, linting, and tagging the build
   checkout:
