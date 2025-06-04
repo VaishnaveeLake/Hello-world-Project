@@ -1,8 +1,8 @@
 # This file lists all the Python dependencies needed for the project.
 # - flask: The main web framework we're using for our app.
 # - flake8: Helps us keep the code clean and PEP8-compliant (linter).
-# - pytz: For handling time zones (used to show localized time).
+# - pytz: For handling time zone conversions (used to show localized time).
 
 flask==2.2.5
-flake8==6.1.0
+flake8==6.1.0 # Python code style and linting tool.
 pytz
