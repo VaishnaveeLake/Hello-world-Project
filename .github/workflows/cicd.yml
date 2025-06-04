@@ -1,6 +1,6 @@
 name: CICD Pipeline       # Giving our workflow a name just for clarity in GitHub Actions UI
 
-# Tell GitHub to run this workflow whenever someone pushes to the main branch.
+# Tell GitHub to run this workflow whenever someone pushes to the main branch
 on:
   push:
     branches: [main]
