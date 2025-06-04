@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted                         ## We'll run this on our own self-hosted runner (Here we are using AWS EC2 instance)
     outputs:
     #Save the generated tag so we can use it in other jobs
-      build_tag: ${{ steps.set_tag.outputs.tag }}       #It is fetching the output value from step named set_tag, specifically the tag output.
+      build_tag: ${{ steps.set_tag.outputs.tag }}            #It is fetching the output value from step named set_tag, specifically the tag output.
   
     steps:
     # Pull down the latest version of the repository 
