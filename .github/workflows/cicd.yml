@@ -53,13 +53,6 @@ jobs:
       uses: actions/checkout@v3       # Check out the code in this job again 
 
 
-# Stop and remove any old containers made from the previous image to avoid conflicts
- #  - name: Clean up old containers using hello-world-app:latest
-  #    run: |
-    #    docker ps -q --filter "ancestor=hello-world-app:latest" | xargs -r docker stop
-     #   docker ps -a -q --filter "ancestor=hello-world-app:latest" | xargs -r docker rm
-
-
  # Build a new Docker image with the unique tag, and don't use cache (so it's always fresh)
     - name: Build Docker image with timestamp
       run: |
