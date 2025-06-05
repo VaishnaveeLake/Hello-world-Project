@@ -14,7 +14,7 @@ jobs:
       build_tag: ${{ steps.set_tag.outputs.tag }}            #It is fetching the output value from step named set_tag, specifically the tag output.
   
     steps:
-    # Pull down the latest version of the repository 
+    # Pull   down the latest version of the repository 
     - name: Checkout code
       uses: actions/checkout@v3  # actions/checkout: The name of the Action (hosted at https://github.com/actions/checkout) version 3
       
